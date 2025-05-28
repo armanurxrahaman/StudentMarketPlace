@@ -1,6 +1,5 @@
-
 const express = require("express");
-const db = require("../config/firebase"); // Firestore instance
+const { db } = require("../config/firebase"); // Firestore instance
 
 const { addItem, getAllItems, editItem } = require("../models/itemsModel");
 const router = express.Router();

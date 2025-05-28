@@ -1,5 +1,5 @@
+const { db } = require("../config/firebase"); // Firestore instance
 const express = require("express");
-const db = require("../config/firebase"); // Firestore instance
 const router = express.Router();
 
 // Reference the "ratings" collection in Firestore
