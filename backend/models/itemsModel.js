@@ -1,4 +1,4 @@
-const { db } = require("../config/firebase");
+const db = require("../config/firebase");
 
 // Reference the "items" collection in Firestore
 const itemsCollection = db.collection("items");

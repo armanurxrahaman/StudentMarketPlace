@@ -12,29 +12,19 @@ const app = express();
 
 // Middleware
 app.use(cookieParser());
-
-// CORS configuration
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://studentmarketplace-frontend.onrender.com'],
+  origin: "http://localhost:5173",
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
-
 app.use(express.json());
-
-// Health check route
-app.get('/', (req, res) => {
-  res.json({ status: 'ok', message: 'Student Marketplace API is running' });
-});
 
 // Routes
 app.use("/users", userRoutes);
 app.use("/items", itemRoutes);
 app.use("/orders", orderRoutes);
 app.use("/email", emailRoutes);
-app.use("/ratings", ratingRoutes);
-app.use("/purchase-requests", purchaseRequestsRoutes);
+app.use("/ratings",ratingRoutes);
+app.use('/purchase-requests', purchaseRequestsRoutes);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

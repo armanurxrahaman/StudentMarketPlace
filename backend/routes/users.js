@@ -1,7 +1,11 @@
+
+
+
 const express = require("express");
+const db = require("../config/firebase"); // Firestore instance
+const { addUser, loginUserByUsername, updateUser, updateUserFlag } = require("../models/userModel");
+
 const router = express.Router();
-const { addUser, getUserByEmail, getUserById, updateUser, deleteUser, getAllUsers, getUserEmailById } = require("../models/userModel");
-const { db } = require("../config/firebase"); // Firestore instance
 
 // Route: Register a new user
 router.post("/register", async (req, res) => {

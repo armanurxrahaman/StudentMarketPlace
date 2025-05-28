@@ -1,5 +1,5 @@
 const express = require("express");
-const { db } = require("../config/firebase"); // Firestore instance
+const db = require("../config/firebase"); // Firestore instance
 const { addItem, getAllItems, editItem } = require("../models/itemsModel"); // Not used here, but for reference
 const { sendEmail, sendHtmlEmail } = require("../utils/emailService");
 const { getUserEmailById } = require("../models/userModel");

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
 import { FiSearch, FiFilter, FiX, FiShoppingCart, FiStar } from 'react-icons/fi';
-import { fetchItems, fetchItemById, fetchSellerRating, createPurchaseRequest } from '../config/api';
 
 // Helper to retrieve a cookie by name
 function getCookie(name) {
@@ -20,8 +19,9 @@ function SellerRating({ sellerId }) {
   useEffect(() => {
     async function fetchRating() {
       try {
-        const data = await fetchSellerRating(sellerId);
-        if (data.averageRating !== undefined) {
+        const response = await fetch(`http://localhost:3000/ratings/get?sellerId=${sellerId}`);
+        const data = await response.json();
+        if (response.ok) {
           setRating(data.averageRating);
         } else {
           setRating(0);
@@ -83,18 +83,18 @@ function Home() {
     }
   }, []);
 
-  const loadItems = async () => {
-    try {
-      const data = await fetchItems();
-      setItems(data.items);
-    } catch (error) {
-      console.error("Error fetching items", error);
-      toast.error("Error fetching items");
-    }
-  };
-
   useEffect(() => {
-    loadItems();
+    fetch("http://localhost:3000/items/all")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.items) {
+          setItems(data.items);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching items", error);
+        toast.error("Error fetching items");
+      });
   }, []);
 
   const getFilteredItems = () => {
@@ -140,15 +140,21 @@ function Home() {
     }));
   };
 
-  const handleItemClick = async (itemId) => {
-    try {
-      const data = await fetchItemById(itemId);
-      setSelectedItem(data.item);
-      setShowModal(true);
-    } catch (error) {
-      console.error("Error fetching item details:", error);
-      toast.error("Error fetching item details");
-    }
+  const handleSuggestionClick = (itemId) => {
+    fetch(`http://localhost:3000/items/${itemId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.item) {
+          setSelectedItem(data.item);
+          setSearchQuery("");
+        } else {
+          toast.error("Item not found");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching item detail:", error);
+        toast.error("Error fetching item details");
+      });
   };
 
   const handleBackToList = () => {
@@ -167,15 +173,23 @@ function Home() {
         toast.error('You cannot request to buy your own item.');
         return;
       }
-      await createPurchaseRequest({
-        itemId: item.id,
-        buyerId: userInfo.userId,
-        sellerId: item.owner_id,
-        quantity: selectedQuantity
+      const res = await fetch('http://localhost:3000/purchase-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemId: item.id,
+          buyerId: userInfo.userId,
+          sellerId: item.owner_id,
+          quantity: selectedQuantity
+        }),
       });
-      toast.success('Request sent to seller!');
-      setShowQuantityModal(false);
-      setSelectedQuantity(1);
+      if (res.ok) {
+        toast.success('Request sent to seller!');
+        setShowQuantityModal(false);
+        setSelectedQuantity(1);
+      } else {
+        toast.error('Failed to send request.');
+      }
     } catch (err) {
       toast.error('Error sending request.');
     }
@@ -486,7 +500,7 @@ function Home() {
               
               <div className="mt-4 sm:mt-6 flex space-x-2 sm:space-x-4">
                 <button
-                  onClick={() => handleItemClick(item.id)}
+                  onClick={() => handleSuggestionClick(item.id)}
                   className="flex-1 bg-teal-600 text-white py-2 px-3 sm:px-4 rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors duration-200 text-xs sm:text-sm"
                 >
                   View Details

@@ -1,5 +1,6 @@
+
 const express = require("express");
-const { db } = require("../config/firebase"); // Firestore instance
+const db = require("../config/firebase"); // Firestore instance
 
 const { addItem, getAllItems, editItem } = require("../models/itemsModel");
 const router = express.Router();
@@ -9,14 +10,14 @@ const {isAuthenticated} = require("../middlewares/authware.js");
 router.post("/add", async (req, res) => {
   try {
     // Expect all required fields including the new 'name' attribute
-    const { category, condition, grade, subject, name, owner_id, price, images, available } = req.body;
+    const { category, condition, grade, subject, name, owner_id, price, images,available } = req.body;
     
     // Validate required fields (reviews are not expected from the frontend)
     if (!category || !condition || !grade || !subject || !name || !owner_id || !price || !images) {
       return res.status(400).json({ error: "All fields are required" });
     }
     
-    const newItem = await addItem(category, condition, grade, subject, name, owner_id, price, images, available);
+    const newItem = await addItem(category, condition, grade, subject, name, owner_id, price, images,available);
     return res.status(201).json({ message: "Item added successfully", item: newItem });
   } catch (error) {
     console.error("Error adding item:", error);
@@ -28,9 +29,6 @@ router.post("/add", async (req, res) => {
 router.get("/all", async (req, res) => {
   try {
     const items = await getAllItems();
-    if (!items) {
-      return res.status(404).json({ error: "No items found" });
-    }
     return res.status(200).json({ items });
   } catch (error) {
     console.error("Error fetching items:", error);
@@ -43,7 +41,10 @@ router.get("/:id", async (req, res) => {
   try {
     const itemId = req.params.id;
     // Get the document from Firestore using the id
-    const docRef = await db.collection("items").doc(itemId).get();
+    const docRef = await require("../config/firebase")
+      .collection("items")
+      .doc(itemId)
+      .get();
     if (!docRef.exists) {
       return res.status(404).json({ error: "Item not found" });
     }

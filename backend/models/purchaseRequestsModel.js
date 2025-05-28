@@ -1,4 +1,4 @@
-const { db } = require("../config/firebase");
+const db = require("../config/firebase");
 const purchaseRequestsCollection = db.collection("purchaseRequests");
 
 // Add a new purchase request
