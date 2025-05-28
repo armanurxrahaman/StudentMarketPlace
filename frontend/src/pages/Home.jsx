@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
 import { FiSearch, FiFilter, FiX, FiShoppingCart, FiStar } from 'react-icons/fi';
+import { fetchItems, fetchItemById } from '../config/api';
 
 // Helper to retrieve a cookie by name
 function getCookie(name) {
@@ -83,18 +84,18 @@ function Home() {
     }
   }, []);
 
+  const loadItems = async () => {
+    try {
+      const data = await fetchItems();
+      setItems(data.items);
+    } catch (error) {
+      console.error("Error fetching items", error);
+      toast.error("Error fetching items");
+    }
+  };
+
   useEffect(() => {
-    fetch("http://localhost:3000/items/all")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.items) {
-          setItems(data.items);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching items", error);
-        toast.error("Error fetching items");
-      });
+    loadItems();
   }, []);
 
   const getFilteredItems = () => {
@@ -140,21 +141,15 @@ function Home() {
     }));
   };
 
-  const handleSuggestionClick = (itemId) => {
-    fetch(`http://localhost:3000/items/${itemId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.item) {
-          setSelectedItem(data.item);
-          setSearchQuery("");
-        } else {
-          toast.error("Item not found");
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching item detail:", error);
-        toast.error("Error fetching item details");
-      });
+  const handleItemClick = async (itemId) => {
+    try {
+      const data = await fetchItemById(itemId);
+      setSelectedItem(data.item);
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error fetching item details:", error);
+      toast.error("Error fetching item details");
+    }
   };
 
   const handleBackToList = () => {
@@ -500,7 +495,7 @@ function Home() {
               
               <div className="mt-4 sm:mt-6 flex space-x-2 sm:space-x-4">
                 <button
-                  onClick={() => handleSuggestionClick(item.id)}
+                  onClick={() => handleItemClick(item.id)}
                   className="flex-1 bg-teal-600 text-white py-2 px-3 sm:px-4 rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors duration-200 text-xs sm:text-sm"
                 >
                   View Details
