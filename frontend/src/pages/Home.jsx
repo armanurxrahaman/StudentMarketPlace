@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
 import { FiSearch, FiFilter, FiX, FiShoppingCart, FiStar } from 'react-icons/fi';
-import { fetchItems, fetchItemById } from '../config/api';
+import { fetchItems, fetchItemById, fetchSellerRating, createPurchaseRequest } from '../config/api';
 
 // Helper to retrieve a cookie by name
 function getCookie(name) {
@@ -20,9 +20,8 @@ function SellerRating({ sellerId }) {
   useEffect(() => {
     async function fetchRating() {
       try {
-        const response = await fetch(`http://localhost:3000/ratings/get?sellerId=${sellerId}`);
-        const data = await response.json();
-        if (response.ok) {
+        const data = await fetchSellerRating(sellerId);
+        if (data.averageRating !== undefined) {
           setRating(data.averageRating);
         } else {
           setRating(0);
@@ -168,23 +167,15 @@ function Home() {
         toast.error('You cannot request to buy your own item.');
         return;
       }
-      const res = await fetch('http://localhost:3000/purchase-requests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          itemId: item.id,
-          buyerId: userInfo.userId,
-          sellerId: item.owner_id,
-          quantity: selectedQuantity
-        }),
+      await createPurchaseRequest({
+        itemId: item.id,
+        buyerId: userInfo.userId,
+        sellerId: item.owner_id,
+        quantity: selectedQuantity
       });
-      if (res.ok) {
-        toast.success('Request sent to seller!');
-        setShowQuantityModal(false);
-        setSelectedQuantity(1);
-      } else {
-        toast.error('Failed to send request.');
-      }
+      toast.success('Request sent to seller!');
+      setShowQuantityModal(false);
+      setSelectedQuantity(1);
     } catch (err) {
       toast.error('Error sending request.');
     }
