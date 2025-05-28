@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = 'https://studentmarketplace-backend.onrender.com';
 
 export const fetchItems = async () => {
   const response = await fetch(`${API_URL}/items/all`);
@@ -22,6 +22,7 @@ export const addItem = async (itemData) => {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(itemData),
   });
   if (!response.ok) {
@@ -36,6 +37,7 @@ export const editItem = async (itemData) => {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(itemData),
   });
   if (!response.ok) {
@@ -58,6 +60,7 @@ export const createPurchaseRequest = async (requestData) => {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(requestData),
   });
   if (!response.ok) {

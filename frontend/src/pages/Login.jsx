@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import { FiUser, FiLock, FiLogIn, FiUserPlus } from 'react-icons/fi';
 import backgroundVideo from '../assets/videoplayback.mp4'; // Import the video
 
+const API_URL = 'https://studentmarketplace-backend.onrender.com';
+
 function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -16,7 +18,7 @@ function Login() {
 
     // POST request to your backend login endpoint
     try {
-      const response = await fetch('http://localhost:3000/users/login', {
+      const response = await fetch(`${API_URL}/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -16,6 +16,7 @@ app.use(cookieParser());
 // CORS configuration
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:5173',
   'https://student-marketplace.vercel.app',
   'https://studentmarketplace-frontend.onrender.com'
 ];
@@ -28,7 +29,9 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
@@ -43,8 +46,8 @@ app.use("/users", userRoutes);
 app.use("/items", itemRoutes);
 app.use("/orders", orderRoutes);
 app.use("/email", emailRoutes);
-app.use("/ratings",ratingRoutes);
-app.use('/purchase-requests', purchaseRequestsRoutes);
+app.use("/ratings", ratingRoutes);
+app.use("/purchase-requests", purchaseRequestsRoutes);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
