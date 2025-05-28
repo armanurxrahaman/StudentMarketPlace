@@ -16,7 +16,8 @@ app.use(cookieParser());
 // CORS configuration
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://student-marketplace.vercel.app', // Add your Vercel URL here
+  'https://student-marketplace.vercel.app',
+  'https://studentmarketplace-frontend.onrender.com'
 ];
 
 app.use(cors({
